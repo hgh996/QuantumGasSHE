@@ -66,7 +66,7 @@ function spinhall_M0(g0::Float64)
         ϕG1=Vg[:,1].*ci[1]
         ϕG2=Vg[:,2].*ci[2]
         
-        Mk0,tz=cal_BdG(lat,ϕG,u0,Γ)
+        Mk0 = cal_BdG(lat,ϕG,u0,Γ)
 
         Jx1,Dhx1 = cal_Ju(ϕG1,Γ,lat.Kvec; u=1,sp=-1)
         Jy1,Dhy1 = cal_Ju(ϕG1,Γ,lat.Kvec; u=2)
@@ -97,8 +97,7 @@ end
 # @time g0=spinhall_M0(0.0); 
 @time g1=spinhall_M0(1.0); 
 
-
-
+series(g1.m0,[abs.(g1.Mspin[3,:]) sqrt.(g1.Mspin[1,:].^2 .+g1.Mspin[2,:].^2)]'./2,color=c,markersize=10)
 
 
 ## --------------------------------------------------------
@@ -129,7 +128,7 @@ sp = cal_bloch_spin(Γ, ϕG, lat, x, x)
 
 ##
 
-fig,_,hm = heatmap(angle.(dn),figure=(size=(500,380),),colormap=:jet)
+fig,_,hm = heatmap(abs2.(up),figure=(size=(500,380),),colormap=:jet,axis=(aspect=1,))
 Colorbar(fig[1,2],hm)
 fig
 
@@ -146,20 +145,14 @@ arrows(x, x, sp[1], sp[2], arrowsize = 5, lengthscale = 1,
 # ---------------------------------------------------
 ##         fig(c)， BdG能谱
 # ---------------------------------------------------
-kl = BzLine([Γ, 0.5.*lat.b[:,1], 0.5.*(lat.b[:,1].+lat.b[:,2]), Γ],256)
-en,ev = eigenband(lat,kl.k, 1:12)
+
+kl = BzLine([Γ, 0.5.*lat.b[:,1], 0.5.*(lat.b[:,1].+lat.b[:,2]), Γ],128)
 xt = (kl.r[kl.pt],["Γ","X","M","Γ"])
-fig= series(kl.r,en; axis=(;xticks=xt),color=repeat(Makie.wong_colors(),5))
-
-
-
-##
-
-@time ben = eig_BdG(lat,ϕG,u0,kl.k,12); ## 55.078
+@time ben = eig_BdG(lat,ϕG,u0,kl.k,12); 
 fig=series(kl.r, ben[1:12,:];
     #color=repeat(Makie.wong_colors(),3),
     solid_color = :blue,
-    figure=(size=(1,0.63).*600,),
+    figure=(size=(1,0.8).*600,),
     linewidth=1.5,
     axis=(;xticks=xt,yticks=range(0,10,6),ygridvisible=false)
 )
@@ -167,7 +160,7 @@ fig=series(kl.r, ben[1:12,:];
 
 
 ## ----- supplimentary material figure Spin Hall -----
-Mk0,tz = cal_BdG(lat,ϕG,u0,Γ)
+Mk0 = cal_BdG(lat,ϕG,u0,Γ)
 Jx,Dhx = cal_Ju(ϕG,Γ,lat.Kvec; u=1,sp=-1)
 Jy,Dhy = cal_Ju(ϕG,Γ,lat.Kvec; u=2,sp=1)
 
